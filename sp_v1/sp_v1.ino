@@ -34,7 +34,7 @@ void loop()
     // and it will stop processing code, waiting for the button to be pressed.
     sleep();
 
-    // After the button is pressed and wakes up the microcontroller, this function will start DFPlayer.
+    // After MTCH101 triggered, its output pin wakes up the microcontroller, this function will start DFPlayer.
     playMusic();
 }
 

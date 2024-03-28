@@ -38,8 +38,18 @@ void loop()
     playMusic();
 }
 
+/*
 ISR(PCINT0_vect)
 {
+    // This is the interrupt service routine, the code that will run when the microcontroller
+    // wakes from sleep due to the button press.  We don't need to do anything here but having
+    // this function is required.
+}
+*/
+
+ISR(INT0_vect)
+{   
+    GIMSK &= ~_BV(INT0);                     // Disable external interrupt
     // This is the interrupt service routine, the code that will run when the microcontroller
     // wakes from sleep due to the button press.  We don't need to do anything here but having
     // this function is required.
@@ -47,10 +57,12 @@ ISR(PCINT0_vect)
 
 void sleep()
 {
-    GIMSK |= _BV(PCIE);                     // Enable Pin Change Interrupts
-    PCMSK |= _BV(PCINT2);                   // Use PB2 as interrupt pin
+    // GIMSK |= _BV(PCIE);                     // Enable Pin Change Interrupts
+    // PCMSK |= _BV(PCINT2);                   // Use PB2 as interrupt pin
+    GIMSK |= _BV(INT0);                        // Enable external interrupt
+    MCUCR |= _BV(ISC00);                       // The low level of INT0 generates an interrupt request
+    
     set_sleep_mode(SLEEP_MODE_PWR_DOWN);
-
     sleep_enable();                         // Sets the Sleep Enable bit in the MCUCR Register (SE BIT)
     sei();                                  // Enable interrupts
     sleep_cpu();                            // Put the microcontroller to sleep
@@ -61,7 +73,10 @@ void sleep()
 
     cli();                                  // Disable interrupts
 
-    PCMSK &= ~_BV(PCINT2);                  // Turn off PB3 as interrupt pin
+    //PCMSK &= ~_BV(PCINT2);                // Turn off PB2 as interrupt pin
+    GIMSK &= ~_BV(INT0);                    // Disable external interrupt, copied to ISR
+    GIFR |= _BV(INTF0);                     // Clear External Interrupt Flag by writing 1
+    
     pinMode(sensePin, INPUT_PULLUP);
     sleep_disable();                        // Clear SE bit
     sei();                                  // Enable interrupts
@@ -93,5 +108,5 @@ void playMusic(void)
     }
 
     digitalWrite(mosfetPin, HIGH);  // Turn off DFPlayer
-    digitalWrite(playPin, LOW); // Set playPin low for power consumption
+    digitalWrite(playPin, LOW); // Set playPin low to lower power consumption
 }

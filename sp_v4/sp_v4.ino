@@ -125,8 +125,8 @@ void playMusic(void)
 {   
     digitalWrite(sensePin, HIGH);   // Set pull up resistor for sense pin
     digitalWrite(mosfetPin, LOW);  // Turn on DFPlayer
-    delay(1500); // Wait for a bit for DFPlayer start
-    
+    delay(1700); // Wait for a bit for DFPlayer start
+
     // configure DFPlayer
     mySerial.println("AT+VOL=6\r\n");
     delay(50);

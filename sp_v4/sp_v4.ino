@@ -23,6 +23,8 @@ uint32_t trackLength = 0;
 
 void setup()
 {   
+    ADCSRA &= ~_BV(ADEN); // ADC off (saves power)
+
     // Setup the pins.
     pinMode(sensePin, INPUT_PULLUP);
     pinMode(mosfetPin, OUTPUT);
@@ -40,8 +42,8 @@ void setup()
     
     delay(100);
     digitalWrite(mosfetPin, HIGH);  // Turn off DFPlayer
-    
-    ADCSRA &= ~_BV(ADEN); // ADC off (saves power)
+
+    delay(5000);  // time to hang the frame)
 
     unsigned int randomCounter = 0;
     while(digitalRead(sensePin) == HIGH){
@@ -49,8 +51,6 @@ void setup()
       delay(1);
     }  // Wait for the first input to set random seed
     randomSeed(randomCounter);
-
-    delay(5000);  // time to hang the frame)
 }
 
 
@@ -125,22 +125,22 @@ void playMusic(void)
 {   
     digitalWrite(sensePin, HIGH);   // Set pull up resistor for sense pin
     digitalWrite(mosfetPin, LOW);  // Turn on DFPlayer
-    delay(2000); // Wait for a bit for DFPlayer start
+    delay(1500); // Wait for a bit for DFPlayer start
     
     // configure DFPlayer
     mySerial.println("AT+VOL=6\r\n");
-    delay(100);
+    delay(50);
     mySerial.println("AT+PLAYMODE=3\r\n");  // play one song and pause
-    delay(100);
-    mySerial.println("AT+AMP=ON\r\n");  // turn on amplifier
-    delay(100);
+    delay(50);
+    // mySerial.println("AT+AMP=ON\r\n");  // turn on amplifier
+    // delay(100);
 
     // play the selected song
     mySerial.println(randomPlayCommand); // play the random song
     delay(1000 * trackLength);  // wait until the end of the song
     
-    mySerial.println("AT+AMP=OFF\r\n");  // turn of amplifier
-    delay(100);
+    // mySerial.println("AT+AMP=OFF\r\n");  // turn of amplifier
+    // delay(100);
     digitalWrite(mosfetPin, HIGH);  // Turn off DFPlayer
     delay(5000); // Wait before next input
 }
